@@ -3,7 +3,46 @@ Created on 6 juil. 2017
 
 @author: Gregory
 '''
+from tools.RegistryInspection import RegistryInspection
 
+class UserList(object):
+    '''
+    Class to store All Users
+    '''
+
+    def __init__(self):
+        '''
+        Constructor
+        '''
+        self.regi = RegistryInspection()
+        self.ulist = []
+        self.build_list()
+            
+    def build_list(self):
+        self.ulist = []
+        
+        for sid in self.regi.get_Users():
+
+            u = User(sid, self.regi.get_ProfilePath(sid))
+            
+            if not u.get_name():
+                continue
+           
+            if self.regi.isAdmin(u.sid):
+                u.set_Admin()
+                
+            if self.regi.isNet(u.sid):
+                u.set_type_net()
+                
+            u.set_run(self.regi.get_Run_User(sid))
+            
+            self.ulist.append(u)
+        
+        sorted(self.ulist, key=lambda user: user.name)
+            
+    def get_list(self):
+        return self.ulist
+    
 class User(object):
     '''
     Class to store User informations discovery
@@ -28,7 +67,10 @@ class User(object):
         elif "S-1-5-20" in self.sid:
             self.name='NetworkService'
         else:
-            self.name=((self.ipp).split('\\'))[-1]
+            try:
+                self.name=(self.ipp.split('\\'))[-1]
+            except:
+                self.name=None
         
     def get_sid(self):
         return self.sid

@@ -92,8 +92,16 @@ class RegistryInspection:
             return False
     
     def get_ProfilePath(self, sid):
-        key=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\\" + sid)
-        return (winreg.EnumValue(key, 0))[1]
+        try:
+            i=0
+            key=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\\" + sid)
+            
+            while 'ProfileImagePath' not in ((winreg.EnumValue(key, i))[0]):
+                key=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList\\" + sid)
+                i+=1
+            return (winreg.EnumValue(key, i))[1]
+        except:
+            return None
     
     def get_ComputerName(self):
         key=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SYSTEM\CurrentControlSet\Control\ComputerName\ComputerName")
@@ -104,7 +112,34 @@ class RegistryInspection:
         key2=winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce")
         return read_subKeysValues(key2, 0, read_subKeysValues(key, 0, read_subKeysNames(key, 0, [])))
     
+    def get_RunOnce_User(self, sid):
+        try:
+            key=winreg.OpenKey(winreg.HKEY_USERS, sid + "\Software\Microsoft\Windows\CurrentVersion\RunOnce")
+            return read_subKeysValues(key, 0, read_subKeysNames(key, 0, []))
+        except:
+            return None
+    
     def get_Run_User(self, sid):
-        key=winreg.OpenKey(winreg.HKEY_USERS, sid + "\Software\Microsoft\Windows\CurrentVersion\Run")
-        key2=winreg.OpenKey(winreg.HKEY_USERS, sid + "\Software\Microsoft\Windows\CurrentVersion\RunOnce")
-        return read_subKeysValues(key2, 0, read_subKeysValues(key, 0, read_subKeysNames(key, 0, [])))
+        try:
+            key=winreg.OpenKey(winreg.HKEY_USERS, sid + "\Software\Microsoft\Windows\CurrentVersion\Run")
+            return read_subKeysValues(key, 0, read_subKeysNames(key, 0, []))
+        except:
+            return None
+        
+    def get_Run(self, sid):
+        ru = self.get_Run_User(sid)
+        rou = self.get_RunOnce_User(sid)
+        if ru:
+            if rou:
+                return ru+rou
+            else:
+                return ru
+        elif rou:
+            return rou
+    
+def main():
+    regi = RegistryInspection()
+    print(regi.get_Run("S-1-5-21-126088033-395669888-2759434248-1001"))
+    
+if __name__ == '__main__':
+    main()

@@ -3,18 +3,20 @@ Created on 6 juil. 2017
 
 @author: Gregory
 '''
+from tools.RegistryInspection import RegistryInspection
 
 class Machine(object):
     '''
     Store computer informations
     '''
 
-    def __init__(self, name):
+    def __init__(self):
         '''
         Constructor
         '''
-        self.name=name
-        self.run=[]
+        self.regi=RegistryInspection()
+        self.name=self.regi.get_ComputerName()
+        self.run=self.regi.get_Run_Machine()
         self.interfaces=[]
         
     def get_name(self):

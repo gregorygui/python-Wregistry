@@ -3,7 +3,8 @@ Created on 9 juil. 2017
 
 @author: Gregory
 '''
-from tkinter import Frame, Button
+from tkinter import Frame, Button, ttk
+from tkinter.constants import TOP, BOTH, X, HORIZONTAL
 
 class StartPage(Frame):
     '''
@@ -16,8 +17,12 @@ class StartPage(Frame):
         Frame.__init__(self, parent)
         self.controller=controller
         
-        computerButton = Button(self, text="Computer Informations", command=lambda:controller.show_frame("ComputerPage"))
-        computerButton.pack(side="top", fill="x", expand=True)
+        separator = ttk.Separator(self, orient=HORIZONTAL)
+        separator.grid(rowspan=1)
+        separator.pack(side=TOP,fill=X)
         
-        userButton = Button(self, text="User Informations", command=lambda:controller.show_frame("UserPage"))
-        userButton.pack(side="bottom", fill="both", expand=True)
+        computerButton = Button(self, text="Computer Informations", command=lambda:controller.show_frame("ComputerPage"))
+        computerButton.pack(side=TOP, fill=BOTH)
+        
+        userButton = Button(self, text="User Informations", command=lambda:controller.show_frame("UserListPage"))
+        userButton.pack(side=TOP, fill=BOTH)

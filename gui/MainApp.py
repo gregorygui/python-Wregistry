@@ -4,10 +4,11 @@ Created on 9 juil. 2017
 @author: Gregory
 '''
 import tkinter
-from tkinter import Menu, BOTH
+from tkinter import Menu
+from tkinter.constants import BOTH, N, E, W, S
 
 from gui.StartPage import StartPage
-from gui.UserPage import UserPage
+from gui.UserListPage import UserListPage
 from gui.ComputerPage import ComputerPage         
 
 class MainApp(tkinter.Tk):
@@ -17,20 +18,22 @@ class MainApp(tkinter.Tk):
         tkinter.Tk.__init__(self, *args, **kwargs)
         tkinter.Tk.wm_title(self, "Windows Forensic")
         self.menuBar()
-        self.config(pady="5")
         
         container=tkinter.Frame(self)
-        container.pack(fill=BOTH, expand=1)
+        container.pack(fill=BOTH, expand=True)
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+        
         self.center_window()
         
         self.frames = {}
         
-        for F in (StartPage, ComputerPage, UserPage):
+        for F in (StartPage, ComputerPage, UserListPage):
             page_name=F.__name__
             frame=F(parent=container, controller=self)
             self.frames[page_name]=frame
-            frame.grid(row=0, column=0, sticky='nsew')
-        
+            frame.grid(row=0, column=0, sticky=N+E+W+S)
+            
         self.show_frame("StartPage")
         
     def show_frame(self, page_name):
@@ -38,8 +41,8 @@ class MainApp(tkinter.Tk):
         frame.tkraise()      
         
     def center_window(self):
-        w=1000
-        h=500
+        w=400
+        h=600
         sw = self.winfo_screenwidth()
         sh = self.winfo_screenheight()
         
