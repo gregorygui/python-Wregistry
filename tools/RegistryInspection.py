@@ -18,6 +18,15 @@ def read_subKeysValues(key, index, l):
         read_subKeysValues(key, index+1, l)
     finally:
         return l
+    
+def read_subKeysData(key, index, l):
+    try:
+        v=winreg.EnumValue(key, index)
+        if "MRUList" not in v[0]:
+            l.append(v[1])
+        read_subKeysData(key, index+1, l)
+    finally:
+        return l
 
 def get_Users_HkeyUsers():
         return read_subKeysNames(winreg.HKEY_USERS, 0, [])
@@ -136,10 +145,24 @@ class RegistryInspection:
                 return ru
         elif rou:
             return rou
-    
+        
+    def get_RunMRU(self, sid):
+        try:
+            key=winreg.OpenKey(winreg.HKEY_USERS, sid + "\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU")
+            return read_subKeysData(key, 0, [])
+        except Exception as e:
+            return e
+        
+    def get_lastFiles(self, sid):
+        try:
+            key=winreg.OpenKey(winreg.HKEY_USERS, sid + "\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs")
+            return read_subKeysData(key, 0, [])
+        except Exception as e:
+            return e
+        
 def main():
     regi = RegistryInspection()
-    print(regi.get_Run("S-1-5-21-126088033-395669888-2759434248-1001"))
+    print(regi.get_lastFiles("S-1-5-21-126088033-395669888-2759434248-1001"))
     
 if __name__ == '__main__':
     main()
